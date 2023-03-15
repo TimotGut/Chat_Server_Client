@@ -51,7 +51,7 @@ class Client{
         }) 
     }
 
-    //immideate server request to synconize local and server data
+    //immediate server request to synconize local and server data
     async syncronizeWithServer(){
         const result = await this.server_fetch(this.ADRESS + "/api/",{
             method: "GET",
