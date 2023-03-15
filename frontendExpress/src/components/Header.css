@@ -1,0 +1,11 @@
+.Header{
+    padding-top: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid white;
+    margin-bottom: 25px;
+
+    font-size: larger;
+    font-weight: 600;
+    text-align: left;
+    
+}

@@ -1,0 +1,14 @@
+.person{
+    border: solid 1px white;
+    border-radius: 20px;
+    margin: 10px auto;
+    padding: 5% 5%;
+    width: fit-content;
+    height: fit-content;
+}
+
+.name{
+    width: fit-content;
+    margin: 5% 0;
+    text-align: center;
+}

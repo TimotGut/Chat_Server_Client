@@ -1,0 +1,119 @@
+.noSelect{
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+.button{
+    transition-duration: 0.2s;
+    cursor: pointer;
+    border: 1px solid white;
+    border-radius: 15px;
+    padding: 10px;
+    
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.button:hover{
+    background-color: rgba(255,255,255,0.2);
+    
+}
+
+.chats{
+    width: 50vw;
+}
+.headline{
+    display: flex;
+    
+    height: 81px;
+
+}
+
+
+.tab{
+    width: 100%;
+    
+    border-top: 1px solid white ;
+    border-right: 1px solid white ;
+    border-left: 1px solid white ;
+    border-radius: 15px;
+    transition-duration: 0.2s;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.tabText{
+    font-size: larger;
+    margin: 0;
+}
+
+.container{
+    height: 60vh;
+    overflow: auto;
+    background-color: rgba(255,255,255,0.05);
+    border: 1px solid white;
+    border-radius: 15px;
+    padding: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    
+}
+.selectChatObject{
+    padding: 15px;
+    border: 1px solid white;
+    border-radius: 15px;
+}
+
+.chatMessage{
+    width: fit-content;
+    height: auto;
+    max-width: 80%;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    overflow-wrap: break-word;
+    
+}
+.yourMessage{
+    margin-left: auto;
+    
+    border: 1px solid rgb(3, 50, 3) ;
+    background-color: rgba(34, 77, 34, 0.829);
+}
+.foreignMessage{
+    
+    background-color: red ;
+}
+
+.sendMessageContainer{
+    
+    border: 1px solid white;
+    border-radius: 15px;
+    border-top-right-radius: 0%;
+    border-top-left-radius: 0%;
+    bottom: 0px;
+    display: flex;
+    
+    
+    padding: 2%;
+    align-items: center;
+}
+
+.sendMessageInput{
+    background-color: light dark;
+    height: 100%;
+    margin-right: 5px;
+    width: 100%;
+}
+
+.sendMessageButton{
+    margin-left: auto;
+}
+
+
+

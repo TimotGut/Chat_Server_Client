@@ -1,0 +1,53 @@
+#root {
+  width: 100%;
+  
+  
+  text-align: center;
+  font-size: 1.15rem;
+}
+body{
+  
+  
+  padding: 15px;
+}
+button{
+  font-size: inherit;
+  padding:10px;
+  border-radius: 5px;
+  border: 0;
+  background-color: rgb(200, 200, 200);
+}
+button:enabled{
+  cursor: pointer;
+}
+button:enabled:active{
+  background-color: rgb(118, 118, 118);
+  color: white;
+}
+button:disabled{
+  background-color: rgb(144, 144, 144);
+  color: #ffffffb8;
+}
+
+input{
+  color: inherit;
+  font-family: inherit ;
+  font-size: inherit;
+}
+
+
+.HeaderContainer{
+  grid-column: 1/3;
+  width: 100%;
+}
+
+
+.body{
+  
+  margin: 10px auto;
+}
+
+.app{
+  width: 100%;
+  
+}
