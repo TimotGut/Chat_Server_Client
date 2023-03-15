@@ -36,7 +36,7 @@ export default function Chat(props){
     function renderActiveTab(){
 
         if(activeTab === "CHATS"){
-            const chatObjects = Chats.map(item => 
+            /*const chatObjects = Chats.map(item => 
                 {
                     
                     return(
@@ -47,7 +47,7 @@ export default function Chat(props){
                         </div>
                     )
                 }
-            )
+            )*/
             const newChatObjects = []
             
             
@@ -65,12 +65,12 @@ export default function Chat(props){
             })
             
             console.log("newChatObjects:" , newChatObjects)
-            if(newChatObjects.length > 0){
+            /*if(newChatObjects.length > 0){
                 chatObjects.push(<div key={"new Chat"}>Start new Chat</div>)
                 newChatObjects.forEach(i => {chatObjects.push(i)});
                 
-            }
-            return  chatObjects
+            }*/
+            return  newChatObjects
         }else{
             const activeChat = getActiveChat();
             if(activeChat === null){
