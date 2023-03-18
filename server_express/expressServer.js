@@ -30,13 +30,7 @@ app.use(bodyParser.urlencoded({extended:false}))
 //Response
 //CRUD: Create Read Update Delete
 //Read
-app.get("/api/", (req, res, next) => {
-    const body = {
-        user: data.userData
-    }
 
-    res.json(body)
-})
 
 
 
@@ -48,15 +42,7 @@ app.post("/api/", (req, res, next) => {
     Update()
     res.send()
 })
-app.post("/api/call/", (req, res, next) => {
-    
-    const ids = req;
 
-    
-    data.newChat(ids[0],ids[1])
-    
-    res.json({})
-})
 
 //new chat
 app.post("/api/start-chat/", (req, res, next) => {
@@ -66,7 +52,7 @@ app.post("/api/start-chat/", (req, res, next) => {
     //if chat does not already exist
     if(data.newChat(body.ids[0],body.ids[1])){
         console.log("New Chat Created " + data.chats.length)
-        Update()
+        Update(body.ids)
     }else{
         console.log("Chat already exsists")
     }
@@ -80,7 +66,7 @@ app.post("/api/new-Chat-Message/", (req,res) => {
     if(data.newChatMessage(body.senderID,body.targetID,body.content) === true){
         console.log("Message Send")
         
-        Update();
+        
         res.status(200)
         
     }else{
@@ -91,8 +77,8 @@ app.post("/api/new-Chat-Message/", (req,res) => {
             //send chat message =>
             if(data.newChatMessage(body.senderID,body.targetID,body.content) === true){
                 console.log("Message Send")
-                Update();
-
+                
+                res.status(200)
             }else{
                 
                 console.log("something has gone wrong 1")
@@ -103,47 +89,35 @@ app.post("/api/new-Chat-Message/", (req,res) => {
             res.status(420)
         }
     }
-    res.send()
+    
+    const chatMessages = data.findChat(body.senderID,body.targetID).chatMessages
+    console.log(chatMessages[chatMessages.length - 1])
+    console.log(eventEmitter.listeners)
+    Update([body.senderID,body.targetID]);
+    res.send("")
+    
 })
+
+app.post("/api/alert/", (req,res) => {
+    const senderID = req.body.senderID;
+    const targetID = req.body.targetID;
+    
+    data.newAlert(senderID,targetID)
+    Update()
+})
+
 
 //Update
-app.put("/api/", (req, res, next) => {
-    
-
-    const handler = function(){
-        //client id
-        const id = req.body.id;
-
-        //find chats with senderID
-        let chats = []
-        data.chats.forEach(element => {
-            if(element.findChatByID(id)){
-                chats.push(element)
-            }
-        });
-
-        
-        const body = {
-            calls: data.calls,
-            chats: chats,
-            user: data.userData,
-        }
-        res.status(200)
-        res.json(body)
-
-
-        eventEmitter.unregister(req.body.id)
-    }
-
-    eventEmitter.register(req.body.id,handler)
-    
-
-    
-
-    
-    
+app.put("/api/update", (req, res, next) => {
+    console.log("register ", req.body.id)
+    eventEmitter.register(req.body.id,() => {updateHandler(req,res)})
 })
+app.put("/api/syncronize", (req, res, next) => {
+    const id = req.body.id
+    const body = getUpdateData(id)
 
+    res.json(body)
+})
 
 
 //Delete
@@ -176,19 +150,67 @@ app.listen(port, () => {
     
     console.log("Server listening on port: " + port)
 })
+automaticUpdate();
 
-
-function Update(){
-    
-    console.log("Sending Update!")
-    
-    eventEmitter.fire()
+function Update(ids){    
+    eventEmitter.fire(ids)
 }
 
-
+function automaticUpdate(){
+    const autoUpdateTime = 1000 * 30; //30 seconds
+    const autoUpdate = setInterval(() => {
+        eventEmitter.fire()
+    }
+    ,autoUpdateTime)
+}
 
 async function sleep(ms) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
     }).catch(function() {});
   }   
+
+  function getUpdateData(clientID){
+    const id = clientID
+    //find chats with senderID
+    let chats = []
+    for (let i = 0; i < data.chats.length; i++) {
+        const item = data.chats[i];
+        if(item.findChatByID(id)){
+            chats.push(item)
+        }
+    }
+
+
+    //pushes all the allerts for an id in the array
+    //then removes it from the stored data
+    const alerts = [];
+    for(let i = 0; i < data.alerts.length;i++){
+        const item = data.alerts[i]
+        if(item.targetID === id){
+            alerts.push(item)
+            data.alerts.splice(i,1)
+            i--;
+        }
+    }
+
+    const body = {
+        chats: chats,
+        user: data.userData,
+        alerts: alerts,
+    }
+    return body
+}
+
+function updateHandler(req,res)
+{
+    //client id
+    const id = req.body.id;
+
+    const body = getUpdateData(id)
+    res.status(200)
+    res.json(body)
+
+
+    eventEmitter.unregister(req.body.id)
+}

@@ -8,6 +8,7 @@ class Data{
         this.userData = []
         
         this.chats = [];//Chat 
+        this.alerts = [];
     }
 
     generateID(){
@@ -17,7 +18,9 @@ class Data{
     }
     
 
-    
+    newAlert(senderID,targetID){
+        this.alerts.push({senderID,targetID})
+    }
     newUser(user){
         this.userData.push(user)
         console.log("New User: " , user)

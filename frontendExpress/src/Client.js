@@ -14,7 +14,7 @@ class Client{
         
 
         return fetch(adress,type).catch(err => {
-            console.log("err" )
+            console.log("error:" , err)
         })
         
     }
@@ -53,11 +53,14 @@ class Client{
 
     //immediate server request to synconize local and server data
     async syncronizeWithServer(){
-        const result = await this.server_fetch(this.ADRESS + "/api/",{
-            method: "GET",
+        const data= {id: this.ID}
+
+        const result = await this.server_fetch(this.ADRESS + "/api/syncronize",{
+            method: "PUT",
             headers: {
                 "Content-type": "application/json"
             },
+            body: JSON.stringify(data)
         })
         const jsonResult = await result.json()
         
@@ -66,13 +69,13 @@ class Client{
         
         return jsonResult;
     }
-    async update(setAllUserData,setChats){
+    async update(){
         const data = 
         {
             id: this.ID,
         }
 
-        const result = await this.server_fetch(this.ADRESS + "/api/",{
+        const result = await this.server_fetch(this.ADRESS + "/api/update",{
             method: "PUT",
             headers: {
                 "Content-type": "application/json"
@@ -80,21 +83,9 @@ class Client{
             body: JSON.stringify(data)
         }).then(res => res.json())
         .catch(err => {console.log("ERROR")})
-         
-
-        
-        console.log("Update: " , result)
-        setAllUserData(result.user);
-
-        setChats(result.chats)
-        console.log(result.chats.length)
-
-        const calls = result.calls;
-        if(calls){
-
-            return await this.getCalled(calls)
-        }
+        //maybe problems because of event before setting values 
         dispatchEvent(this.updateEvent)
+        return result
     }
 
     async getCalled(calls){
@@ -163,6 +154,19 @@ class Client{
         .catch(err => {console.log("ERROR: " , err)})
     }
 
+    async sendAlert(senderID,targetID){
+        const data = {
+            senderID: senderID,
+            targetID:targetID,
+        }
+        const result = await this.server_fetch(this.ADRESS + "/api/alert/",{
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+    }
 }
 
 

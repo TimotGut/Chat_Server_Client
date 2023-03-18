@@ -24,10 +24,11 @@ function App() {
   const [state,setState] = useState("LOGIN")
 
   const [name, setName] = useState("No Name")
-  const [chats,setChats] = useState([]);
 
-  
+  const [chats,setChats] = useState([]);
+  const [alerts, setAlerts] = useState([])
   const [allUserData,setAllUserData] = useState([])
+
 
 
   
@@ -43,8 +44,8 @@ function App() {
           setAllUserData(data.user)
           console.log("Sync: " , data.user)
 
-          setClient(newClient) 
           
+          setClient(newClient) 
           updateLoop(newClient);
         });
         
@@ -64,12 +65,18 @@ function App() {
     while(true){
       if(client){
         await client.update(setAllUserData,setChats).then(res => {
-      
-          if(res === true){
-            //It means you are getting called
+
+          setChats(res.chats)
+          setAllUserData(res.user)
+          setAlerts(res.alerts)
+          if(res.alerts && res.alerts.length > 0){
+            
+            
             audio.play();
           }
+
           
+          console.log("Update: " , res)          
         })
       }else{
         console.log("client not defined")

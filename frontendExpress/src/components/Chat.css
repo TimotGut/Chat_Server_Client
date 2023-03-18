@@ -14,14 +14,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
 }
 .button:hover{
     background-color: rgba(255,255,255,0.2);
     
 }
 
-.chats{
-    width: 50vw;
+
+.Chats{
+    max-width: 800px;
+    margin: auto;
 }
 .headline{
     display: flex;
@@ -115,5 +118,11 @@
     margin-left: auto;
 }
 
+.sendAlertButton{
+    background-color: rgb(156, 80, 54);
+}
 
+.sendAlertButton:hover{
+    background-color: rgb(163, 39, 28);
+}
 

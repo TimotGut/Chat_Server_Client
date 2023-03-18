@@ -5,7 +5,7 @@ class Chat{
         //int[2]
         this.ids = ids;
 
-        this.chatMessages = chatMessages ? chatMessages : []
+        this.chatMessages = chatMessages !== undefined ? chatMessages : []
     }
 
     newMessage(message, targetID, senderID) {

@@ -1,4 +1,4 @@
-import React, { useEffect , useRef } from "react";
+import { useState, useEffect , useRef } from "react";
 import './Chat.css'
 export default function Chat(props){
     const {Chats,getUserDataById,client, allUser} = props   
@@ -6,75 +6,89 @@ export default function Chat(props){
     const refContainer = useRef()
 
 
-    
+    // format "someId" : "number of messages read" 
+    const [readMessages,setReadMessages] = useState({})
 
     
-    const [activeChatIds,setActiveChatIds] = React.useState()
-    const [activeTab,setActiveTab] = React.useState("CHATS")
-    const [input,setInput] = React.useState("")
+    const [activeChatIds,setActiveChatIds] = useState()
+    const [activeTab,setActiveTab] = useState("CHATS")
+    const [input,setInput] = useState("")
     function ChatsTabClickHandel(){
+        if(activeChatIds){
+            const otherID = activeChatIds[0] === client.id ? activeChatIds[0] : activeChatIds[1];
+            setReadMessages(prev => {
+                prev[otherID] = getActiveChat().chatMessages.length;
+                return prev
+            })
+        }
         setActiveTab("CHATS")
+        setActiveChatIds(null)
     }
     function SpecificChatTabClickHandel(){
         setActiveTab("ACTIVE_CHAT")
     }
     function getActiveChat(){
-        
+        return getChat(activeChatIds[0],activeChatIds[1])
+    }
+    function getChat(id_a,id_b){
         for (let i = 0; i < Chats.length; i++) {
             const element = Chats[i];
             
-            if(element.ids[0] === activeChatIds[0] && element.ids[1] === activeChatIds[1] 
-                || element.ids[0] === activeChatIds[1] && element.ids[1] === activeChatIds[0]){
+            if(element.ids[0] === id_b && element.ids[1] === id_a 
+                || element.ids[0] === id_a && element.ids[1] === id_b){
                 return element;
             }
         }
-            
-        
-        return null;
-        
+        return null
     }
+
     function renderActiveTab(){
 
         if(activeTab === "CHATS"){
-            /*const chatObjects = Chats.map(item => 
-                {
-                    
-                    return(
-                        <div className="selectChatObject noSelect button"
-                            key={item.ids[0] + "/" + item.ids[1]}
-                            onClick={()=>{setActiveChatIds(item.ids);SpecificChatTabClickHandel()}}>
-                            {getOtherChatName(client.ID,item.ids)}
-                        </div>
-                    )
-                }
-            )*/
+            
             const newChatObjects = []
             
             
             console.log("all user" ,allUser.length)
             allUser.forEach(user => {
+                const chat = getChat(client.ID,user.id);
+                const messagesRead = readMessages[user.id] ? readMessages[user.id] : 0;
+                let messagesUnread
+                if(chat !== null){
+                    messagesUnread = chat.chatMessages.length - messagesRead;
+                }
                 if(user.id !== client.ID ){
                     newChatObjects.push (
                         <div className="selectChatObject noSelect button"
                             key={client.ID + "/" + user.id}
-                            onClick={()=>{setActiveChatIds([client.ID, user.id]);SpecificChatTabClickHandel()}}>
-                            {user.name}
+                            onClick={()=>{
+                                setActiveChatIds([client.ID, user.id]);
+                                setReadMessages(prev => {
+                                    const chat = getChat(client.ID,user.id)
+                                    if(chat !== null){
+                                        prev[user.id] = chat.chatMessages.length;
+                                    }
+                                    return prev
+                                })
+                                SpecificChatTabClickHandel()
+                                }}>
+                            {user.name} {messagesUnread !== undefined && messagesUnread !== 0 ? " [" + messagesUnread + "]" : ""}
                         </div>)
                 }
                 
             })
             
             console.log("newChatObjects:" , newChatObjects)
-            /*if(newChatObjects.length > 0){
-                chatObjects.push(<div key={"new Chat"}>Start new Chat</div>)
-                newChatObjects.forEach(i => {chatObjects.push(i)});
-                
-            }*/
             return  newChatObjects
-        }else{
+        }
+
+
+
+        if(activeTab === "ACTIVE_CHAT"){
+            
             const activeChat = getActiveChat();
             if(activeChat === null){
-                
+                return <div>Keine Nachichten bisher.</div>
             }else{
                 const chatObjects = activeChat.chatMessages.map(item => 
                     {
@@ -89,7 +103,11 @@ export default function Chat(props){
                         )
                     }
                 )
+
+                    
                 return chatObjects
+                
+                
             }
             
         }
@@ -110,6 +128,9 @@ export default function Chat(props){
             setInput("")
 
         }
+    }
+    function sendAlertButton(){
+        client.sendAlert(client.ID,getOtherID(client.ID,activeChatIds))
     }
 
     function handelSubmitWithEnter(event){
@@ -147,6 +168,11 @@ export default function Chat(props){
                         className="sendMessageButton button"
                         onClick={sendMessageButton}
                         >Send</div>
+
+                    <div 
+                        className="sendAlertButton button"
+                        onClick={sendAlertButton}
+                        >Alert</div>
                 </div>}
             
         </div>
