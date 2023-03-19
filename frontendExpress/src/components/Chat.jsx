@@ -13,6 +13,8 @@ export default function Chat(props){
     const [activeChatIds,setActiveChatIds] = useState()
     const [activeTab,setActiveTab] = useState("CHATS")
     const [input,setInput] = useState("")
+    const [alertSending,setAlertSending] = useState(false);
+
     function ChatsTabClickHandel(){
         if(activeChatIds){
             const otherID = activeChatIds[0] === client.id ? activeChatIds[0] : activeChatIds[1];
@@ -130,7 +132,12 @@ export default function Chat(props){
         }
     }
     function sendAlertButton(){
-        client.sendAlert(client.ID,getOtherID(client.ID,activeChatIds))
+        if(alertSending === false){
+            setAlertSending(true);
+            client.sendAlert(client.ID,getOtherID(client.ID,activeChatIds)).then(() => {
+                setAlertSending(false);
+            })
+        }
     }
 
     function handelSubmitWithEnter(event){

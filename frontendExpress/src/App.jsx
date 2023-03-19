@@ -19,11 +19,11 @@ function generateID(){
 function App() {
 
   const  [audio,setAudio] = useState(new Audio(bimmeln));
-  const [client, setClient] = useState("")
+  const [client, setClient] = useState()
 
   const [state,setState] = useState("LOGIN")
 
-  const [name, setName] = useState("No Name")
+  const [name, setName] = useState(getLocalStorage("essen-kommen-express-name","No Name"))
 
   const [chats,setChats] = useState([]);
   const [alerts, setAlerts] = useState([])
@@ -107,9 +107,7 @@ function App() {
   }
 
   function changeName(value){
-
     setName(value)
-    
   }
 
   function Persons(){
@@ -126,8 +124,19 @@ function App() {
         }
       })
     }
+  }
+  function getLocalStorage(key,initialValue){
+    const jasonValue = localStorage.getItem(key) 
+    if(jasonValue != null){
+      console.log(JSON.parse(jasonValue));
+      return JSON.parse(jasonValue)
+    } 
+    else 
+      return initialValue
+  }
 
-     
+  function setLocalStorage(key,value){
+    localStorage.setItem(key,JSON.stringify(value))
   }
 
   function getUserDataById(id){
@@ -150,9 +159,12 @@ function App() {
       {state === "LOGIN"&&
       
         <Login 
-          changeName={changeName}
           userName={name}
-          login= {() => setState("MAIN")}
+          changeName={changeName}
+          login= {() => {
+            setState("MAIN")
+            setLocalStorage("essen-kommen-express-name",name)
+          }}
         />
       }
       {state === "MAIN" &&

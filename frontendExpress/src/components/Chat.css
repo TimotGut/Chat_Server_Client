@@ -108,7 +108,7 @@
 }
 
 .sendMessageInput{
-    background-color: light dark;
+    background-color: inherit;
     height: 100%;
     margin-right: 5px;
     width: 100%;
