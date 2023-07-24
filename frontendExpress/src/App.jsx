@@ -22,46 +22,65 @@ function App() {
   const [client, setClient] = useState()
 
   const [state,setState] = useState("LOGIN")
-
-  const [name, setName] = useState(getLocalStorage("essen-kommen-express-name","No Name"))
+  const [autoLogin,setAutoLogin] = useState(false)
+  const [name, setName] = useState("No Name")
 
   const [chats,setChats] = useState([]);
   const [alerts, setAlerts] = useState([])
   const [allUserData,setAllUserData] = useState([])
 
+  const serverAdress = "http://192.168.178.59:1337"
 
-
-  
+  const LOGINSTATE = "LOGIN";
+  const MAINSTATE = "MAIN;"
+  const localNameKey = "essen-kommen-express-username";
 
   useEffect(() => {
-    if(state === "MAIN"){
+    if(state === LOGINSTATE) {
+      const localName = getLocalStorage(localNameKey)
+      if(localName !== null && localName !== undefined && localName !== "" && localName !== false)
+      {
+        setName(localName)  
 
-      let newClient = new Client("http://192.168.178.59:1337", id, name);
-      console.log("connect to Server")
+        if(autoLogin === true){
+          login()
+        }     
+      }
+
       
-      newClient.connectNewUser(name).then(() => {
-        newClient.syncronizeWithServer().then((data) => {
-          setAllUserData(data.user)
-          console.log("Sync: " , data.user)
+    }
+    else if(state === MAINSTATE){
 
-          
-          setClient(newClient) 
-          updateLoop(newClient);
-        });
+      let newClient = new Client(serverAdress, id, name);
+      console.log("connecting to Server...")
+      
+      newClient.connectNewUser(name).then((result) => {
         
-
-
-      })
-      
-      
-
-      
+        if(result.status === 200){
+          console.log("Connected successfully")
+          newClient.syncronizeWithServer().then((data) => {
+            setAllUserData(data.user)
+            console.log("Sync: " , data.user)
+  
+            
+            setClient(newClient) 
+            updateLoop(newClient);
+          });  
+        }else{
+          setState(LOGINSTATE)
+          result.json().then(res => {
+            console.log(res.text)
+            prompt(res.text);
+          })
+          
+        }
+        
+      }) 
     }
   }, [state])
 
 
   async function updateLoop(client){
-    
     while(true){
       if(client){
         await client.update(setAllUserData,setChats).then(res => {
@@ -70,8 +89,6 @@ function App() {
           setAllUserData(res.user)
           setAlerts(res.alerts)
           if(res.alerts && res.alerts.length > 0){
-            
-            
             audio.play();
           }
 
@@ -88,51 +105,32 @@ function App() {
     
   }
 
-
-  
-
   window.addEventListener("beforeunload", (event) => {
     if(client){
       console.log("disconnect");
       client.disconnect()
     }
   });
-
-  
-  
-  
-  
+ 
   function startChat(targetUserData){
     client.startChat(targetUserData.id)
   }
 
   function changeName(value){
     setName(value)
+    setLocalStorage(localNameKey,value)
   }
-
-  function Persons(){
-    
-    if(allUserData){
-      return allUserData.map(item => {
-        if(item.id !== id){
-          return (
-          <Person
-            key={item.id}
-            UserData={item}
-            startChat={() => {startChat(item)}}
-          />)
-        }
-      })
-    }
-  }
-  function getLocalStorage(key,initialValue){
+  
+  
+  function getLocalStorage(key){
     const jasonValue = localStorage.getItem(key) 
-    if(jasonValue != null){
-      console.log(JSON.parse(jasonValue));
+    if(jasonValue !== null && jasonValue !== undefined){
       return JSON.parse(jasonValue)
     } 
-    else 
-      return initialValue
+    else{
+      return false;
+    }
+      
   }
 
   function setLocalStorage(key,value){
@@ -144,35 +142,45 @@ function App() {
     if(!userData){
       console.log(allUserData)
       console.log("No User Data found for id: " + id)
+      return false;
     }
     return userData
   }
 
+  /**
+   * Get from Login to Main screen
+   */
+  function login(){
+    setState(MAINSTATE)
+  }
 
-
-
-
+  function logout(){
+    console.log("disconnect");
+    client.disconnect()
+    setClient(undefined)
+    setAutoLogin(false)
+    setState(LOGINSTATE)
+  }
+  
   
   return (
     <div className="app">
       
-      {state === "LOGIN"&&
+      {state === LOGINSTATE &&
       
         <Login 
           userName={name}
           changeName={changeName}
-          login= {() => {
-            setState("MAIN")
-            setLocalStorage("essen-kommen-express-name",name)
-          }}
+          login= {login}
         />
       }
-      {state === "MAIN" &&
+      {state === MAINSTATE &&
         
         <div className='body'>
           <div className='HeaderContainer'>
             <Header
               name={name}
+              logout={logout}
               />
           </div>
           

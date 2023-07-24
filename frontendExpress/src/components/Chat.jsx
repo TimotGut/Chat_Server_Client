@@ -18,10 +18,14 @@ export default function Chat(props){
     function ChatsTabClickHandel(){
         if(activeChatIds){
             const otherID = activeChatIds[0] === client.id ? activeChatIds[0] : activeChatIds[1];
-            setReadMessages(prev => {
-                prev[otherID] = getActiveChat().chatMessages.length;
-                return prev
-            })
+            const activeChat = getActiveChat();
+
+            if(activeChat !== null){
+                setReadMessages(prev => {
+                    prev[otherID] = activeChat.chatMessages.length;
+                    return prev
+                })
+            }
         }
         setActiveTab("CHATS")
         setActiveChatIds(null)
@@ -45,7 +49,9 @@ export default function Chat(props){
     }
 
     function renderActiveTab(){
-
+        if(!client){
+            return
+        }
         if(activeTab === "CHATS"){
             
             const newChatObjects = []
@@ -120,12 +126,19 @@ export default function Chat(props){
     }
     function getOtherChatName(yourId,chatIds){
         let otherId = getOtherID(yourId,chatIds)
-        let otherUsername = getUserDataById(otherId).name
-        return otherUsername
+        const otherUser = getUserDataById(otherId);
+        //otherUser doesn't exist. It may have disconnected
+        if(otherUser === false){
+            ChatsTabClickHandel()
+        }else{
+            let otherUsername = otherUser.name
+            return otherUsername
+        }
     }
 
     function sendMessageButton(){
         if(input != ""){
+            console.log("Send " + input)
             client.newChatMessage(getOtherID(client.ID,activeChatIds),input)
             setInput("")
 

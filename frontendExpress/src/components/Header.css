@@ -7,5 +7,15 @@
     font-size: larger;
     font-weight: 600;
     text-align: left;
-    
+    align-items: center;
+    display: flex;
+}
+
+.Logout{
+    margin-left: auto;
+    color: rgb(221, 76, 76);
+    border-color: rgb(221, 76, 76);
+}
+.Logout:hover{
+    background-color: rgb(85, 21, 21);
 }

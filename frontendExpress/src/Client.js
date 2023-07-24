@@ -7,15 +7,13 @@ class Client{
         this.ADRESS = adress
         this.ID = id
         this.updateEvent = new Event("updateEvent")
-        this.server_fetch("sda")
+        //this.server_fetch("sda")
     }
 
     async server_fetch(adress,type){
         
 
-        return fetch(adress,type).catch(err => {
-            console.log("error:" , err)
-        })
+        return await fetch(adress,type)
         
     }
 
@@ -42,13 +40,14 @@ class Client{
             id: this.ID,
         }
         
-        await this.server_fetch(this.ADRESS + "/api/",{
+        let res = await this.server_fetch(this.ADRESS + "/api/",{
             method: "POST",
             headers: {
                 "Content-type": "application/json"
             },
             body: JSON.stringify(user)
-        }) 
+        })
+        return res
     }
 
     //immediate server request to synconize local and server data
